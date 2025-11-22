@@ -2,24 +2,30 @@
 macro ldr_proto kind, expr, rb, rw, rd, rq {
     local matched
     matched equ FALSE
-    match =byte e, expr \{
+    match =lea, kind \{
         matched equ TRUE
-        kind rb, byte e
-    \}
-    match =word e, expr \{
-        matched equ TRUE
-        kind rw, word e
-    \}
-    match =dword e, expr \{
-        matched equ TRUE
-        kind rd, dword e
-    \}
-    match =qword e, expr \{
-        matched equ TRUE
-        kind rq, qword e
+        kind rq, expr
     \}
     match =FALSE, matched \{
-        kind rd, dword e
+        match =byte e, expr \\{
+            matched equ TRUE
+            kind rb, byte e
+        \\}
+        match =word e, expr \\{
+            matched equ TRUE
+            kind rw, word e
+        \\}
+        match =dword e, expr \\{
+            matched equ TRUE
+            kind rd, dword e
+        \\}
+        match =qword e, expr \\{
+            matched equ TRUE
+            kind rq, qword e
+        \\}
+        match =FALSE, matched \\{
+            kind rd, dword expr
+        \\}
     \}
 }
 

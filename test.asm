@@ -7,6 +7,7 @@ segment .text
 
 _start:
     call print, qword msg
+    syscall SYS_WRITE, ~byte STDOUT, lea [msg + 4], [msg]
     syscall SYS_EXIT, ~byte 0x45
 
 print: ; (string)

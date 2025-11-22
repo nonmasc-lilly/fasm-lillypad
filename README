@@ -23,12 +23,13 @@ ldr reg, expr
 
         Expressions are formed with the following CBNF:
 
-                <type> ::= "byte" | "word" | "dword" | "qword"
-                <expression> ::= ["~"] [type] <movable item>
+                <type>       ::= "byte" | "word" | "dword" | "qword"
+                <kinde>      ::= "lea" | "mov"
+                <expression> ::= ["~"] [kind] [type] <movable item>
 
         Where <movable item> is any expression which could be used with a register and the `mov' instruction. Note that the correct register size is chosen
-        according to the type given, `dword' is default. When allocating a byte typed value to rax, rbx, rcx, or rdx, the value is assigned to the `l'
-        variant instead of the `h' variant (i.e., `al' over `ah').
+        according to the type given, `dword' is default ([1.1.1] lea may only use `qword'). When allocating a byte typed value to rax, rbx, rcx, or rdx, the
+        value is assigned to the `l' variant instead of the `h' variant (i.e., `al' over `ah').
 
 syscall syscode*, [arg]
         Runs the syscall of the value syscode. Each argument after syscode is an expression of the following form:
@@ -108,6 +109,8 @@ enum arg*
         1.1.0
         - Changes to segment applied (.text, .data, .rodata added)
         - Fix call not working properly
+        1.1.1
+        - Fix lea syntax to omit typing (only qword typing is defined for lea)
 
 ---     References
 
