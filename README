@@ -1,0 +1,91 @@
+---     fasm-lillypad   (1.0)
+
+Lillypad is a fasm library implementing basic macros that I commonly use with added syntax nicities.
+
+---     Documentation
+
+ldr reg, expr
+        Loads the expression `expr' into the register `reg'. Registers are one of the following:
+        - rax
+        - rbx
+        - rcx
+        - rdx
+        - rsi
+        - rdi
+        - r8
+        - r9
+        - r10
+        - r11
+        - r12
+        - r13
+        - r14
+        - r15
+
+        Expressions are formed with the following CBNF:
+
+                <type> ::= "byte" | "word" | "dword" | "qword"
+                <expression> ::= ["~"] [type] <movable item>
+
+        Where <movable item> is any expression which could be used with a register and the `mov' instruction. Note that the correct register size is chosen
+        according to the type given, `dword' is default. When allocating a byte typed value to rax, rbx, rcx, or rdx, the value is assigned to the `l'
+        variant instead of the `h' variant (i.e., `al' over `ah').
+
+syscall syscode*, [arg]
+        Runs the syscall of the value syscode. Each argument after syscode is an expression of the following form:
+
+                <arg expr> ::= "_" ":=" <integer> | <register> ":=" <expression> | "_" | <expression>
+
+        See `ldr reg, expr' for the definition of <expression> and which registers are able to be used for <register>. Syscall begins its register count
+        at zero, and for each subsequent argument where a register is not explicitly stated it is incremented by one. It's value determines which register
+        is assigned and it may be defined directly with the `"_" ":=" <integer>' production rule. When the argument "_" is used on its own, this value
+        is incremented by one, effectively skipping a register, the register order is as follows:
+        0: rdi
+        1: rsi
+        2: rdx
+        3: r10
+        4: r8
+        5: r9
+
+call address*, [arg]
+        Calls the function at address. Each argument after address is an <arg expr> of the form described in `syscall syscode*, [arg]'. Note however that
+        the register order does differ by one value, 3 = rcx, rather than r10; its values are therefore as follows:
+        0: rdi
+        1: rsi
+        2: rdx
+        3: rcx
+        4: r8
+        5: r9
+
+strdef_typed name_expr*, [dat]
+        Defines a string with a specified size bit-width and element length. name_expr is an expression of the following form:
+
+                <name expr> ::= <type> <identifier> "[" <type> "]"
+
+        See `ldr reg, expr' for the definition of <type>. The string name will be that of <identifier>, its element type that of the prefacing <type> and
+        its bit width that of the suffixed <type>, enclosed in square brackets. Its value in memory, where it is placed, begin with the size (of the bit
+        width provided) followed by some number of elements (of the bit width provided) given by dat.
+
+strdef name*, [dat]
+        Defines a classical string, equivalent to:
+
+                common
+                        strdef_typed byte name [dword], dat
+
+enum arg*
+        Defines a set of integer values, each argument is an expression of the following form:
+
+                <enum expr> ::= <identifier> | <identifier> ":=" <integer>
+
+        For all identifiers given without a value, the value assigned is that of the counter. Beginning at zero for the first element, for each element it
+        is incremented by one. When an identifier is given a value, the counter is set to that value, and incremented for the next element.
+
+--- Enumerations
+
+        There are the following defined enumerations:
+
+        - The standard files (STDIN, STDOUT, STDERR).
+        - The linux x86_64 syscall codes (See flib.inc).
+
+---     References
+
+        - CBNF definition       https://github.com/nonmasc-lilly/CBNF

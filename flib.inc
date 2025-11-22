@@ -113,9 +113,15 @@ common
 forward
 match any, arg \{
     matched equ FALSE
-    match reg =:== expr, arg \\{
+    match =_ =:== expr, arg \\{
         matched equ TRUE
-        ldr reg, expr
+        rg = expr
+    \\}
+    match =FALSE, matched \\{
+        match reg =:== expr, arg \\\{
+            matched equ TRUE
+            ldr reg, expr
+        \\\}
     \\}
     match =_, arg \\{
         matched equ TRUE
@@ -155,10 +161,15 @@ common
 forward
 match any, arg \{
     matched equ FALSE
-    match reg =:== expr, arg \\{
+    match =_ =:== expr, arg \\{
         matched equ TRUE
-        ldr reg, expr
+        rg = expr
     \\}
+    match =FALSE, matched \\{
+        match reg =:== expr, arg \\\{
+            matched equ TRUE
+            ldr reg, expr
+        \\\}
     match =_, arg \\{
         matched equ TRUE
         rg = rg + 1
@@ -270,7 +281,7 @@ forward
 ; STD FILDES
 enum\
     STDIN, STDOUT, STDERR
-; SYSCALLS
+; SYSCALLS as stated in: <https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/>
 enum\
     SYS_READ,                   SYS_WRITE,                  SYS_OPEN,\
     SYS_CLOSE,                  SYS_STAT,                   SYS_FSTAT,\
