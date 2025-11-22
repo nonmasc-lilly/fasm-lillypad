@@ -36,8 +36,6 @@ common
         ldr_proto mov, e, rb, rw, rd, rq
     \}
     match =FALSE, matched \{
-        match =edi, rd \\{
-        \\}
         ldr_proto mov, expr, rb, rw, rd, rq
     \}
 }
@@ -170,6 +168,7 @@ match any, arg \{
             matched equ TRUE
             ldr reg, expr
         \\\}
+    \\}
     match =_, arg \\{
         matched equ TRUE
         rg = rg + 1
@@ -254,6 +253,30 @@ forward
     kind dat
 common
     @@:
+}
+
+segment fix seg
+macro seg first {
+common
+    local matched
+    matched equ FALSE
+    segment fix segment
+    match =.text, first \{
+        matched equ TRUE
+        segment readable executable
+    \}
+    match =.data, first \{
+        matched equ TRUE
+        segment readable writeable
+    \}
+    match =.rodata, first \{
+        matched equ TRUE
+        segment readable
+    \}
+    match =FALSE, matched \{
+        segment first
+    \}
+    segment fix seg
 }
 
 macro strdef name*, [dat] {

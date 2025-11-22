@@ -1,4 +1,4 @@
----     fasm-lillypad   (1.0)
+---     fasm-lillypad   (1.1.0)
 
 Lillypad is a fasm library implementing basic macros that I commonly use with added syntax nicities.
 
@@ -79,6 +79,16 @@ enum arg*
         For all identifiers given without a value, the value assigned is that of the counter. Beginning at zero for the first element, for each element it
         is incremented by one. When an identifier is given a value, the counter is set to that value, and incremented for the next element.
 
+
+--- Changes to the `segment' command (1.1.0)
+
+        The segment command works as prior intended, however in the case that only the `.text', `.data' or `.rodata' and no other argument, the following
+        mappings apply:
+
+                segment .text   --> segment readale executable
+                segment .data   --> segment readale writeable
+                segment .rodata --> segment readale
+
 --- Enumerations
 
         There are the following defined enumerations:
@@ -86,6 +96,20 @@ enum arg*
         - The standard files (STDIN, STDOUT, STDERR).
         - The linux x86_64 syscall codes (See flib.inc).
 
+---     Changelog
+
+        1.0.0
+        - ldr added
+        - initial syscall changes applied
+        - initial call changes applied
+        - enum added
+        - strdef_typed added
+        - strdef added
+        1.1.0
+        - Changes to segment applied (.text, .data, .rodata added)
+        - Fix call not working properly
+
 ---     References
 
         - CBNF definition       https://github.com/nonmasc-lilly/CBNF
+

@@ -3,7 +3,7 @@ entry _start
 
 include "flib.inc"
 
-segment readable executable
+segment .text
 
 _start:
     call print, qword msg
