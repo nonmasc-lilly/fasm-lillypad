@@ -307,6 +307,16 @@ forward
     x = x + 1
 }
 
+macro lillypad_definitions {
+    cstrlen: ; (string)
+        mov rsi, rdi
+        xor eax, eax
+        rep scasb
+        mov rax, rdi
+        sub rax, rsi
+        ret
+}
+
 ; STD FILDES
 enum\
     STDIN, STDOUT, STDERR

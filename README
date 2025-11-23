@@ -80,6 +80,14 @@ enum arg*
         For all identifiers given without a value, the value assigned is that of the counter. Beginning at zero for the first element, for each element it
         is incremented by one. When an identifier is given a value, the counter is set to that value, and incremented for the next element.
 
+--- Utility functions
+
+        The macro `lillypad_definitions' describes a group of functions. When placed in a text section, one can use the functions here described:
+
+
+ [1.2.0]        cstrlen(*string)
+                        Gives the length of the null terminated string.
+
 
 --- Changes to the `segment' command (1.1.0)
 
@@ -111,6 +119,9 @@ enum arg*
         - Fix call not working properly
         1.1.1
         - Fix lea syntax to omit typing (only qword typing is defined for lea)
+        1.2.0
+        - Added lillypad_definitions
+        - Added cstrlen under lillypad_definitions
 
 ---     References
 
