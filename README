@@ -1,4 +1,4 @@
----     fasm-lillypad   (1.2.1)
+---     fasm-lillypad   (1.2.2)
 
 Lillypad is a fasm library implementing basic macros that I commonly use with added syntax nicities.
 
@@ -104,6 +104,7 @@ enum arg*
 
         - The standard files (STDIN, STDOUT, STDERR).
         - The linux x86_64 syscall codes (See flib.inc).
+        - The O_ fcntl open flags (O_RDONLY, O_WRONLY, O_RDWR).
 
 ---     Changelog
 
@@ -124,6 +125,8 @@ enum arg*
         - Added cstrlen under lillypad_definitions
         1.2.1
         - fix cstrlen
+        1.2.2
+        - add O_ fcntl open flags.
 
 ---     References
 

@@ -323,6 +323,9 @@ macro lillypad_definitions {
 ; STD FILDES
 enum\
     STDIN, STDOUT, STDERR
+; FCNTL O_
+enum\
+    O_RDONLY, O_WRONLY, O_RDWR
 ; SYSCALLS as stated in: <https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/>
 enum\
     SYS_READ,                   SYS_WRITE,                  SYS_OPEN,\
