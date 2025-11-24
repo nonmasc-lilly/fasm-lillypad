@@ -1,2 +1,2 @@
 fasm ./test.asm ./test
-./test
+./test abc def

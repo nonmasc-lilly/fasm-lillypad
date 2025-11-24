@@ -311,9 +311,12 @@ macro lillypad_definitions {
     cstrlen: ; (string)
         mov rsi, rdi
         xor eax, eax
-        rep scasb
+        xor ecx, ecx
+        dec rcx
+        repne scasb
         mov rax, rdi
         sub rax, rsi
+        dec rax
         ret
 }
 
