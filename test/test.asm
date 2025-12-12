@@ -1,7 +1,7 @@
 format elf64 executable 3
 entry _start
 
-include "flib.inc"
+include "../flib.inc"
 
 segment .text
 

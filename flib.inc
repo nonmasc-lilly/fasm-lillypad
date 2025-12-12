@@ -308,6 +308,7 @@ forward
 }
 
 macro lillypad_definitions {
+    segment .text
     cstrlen: ; (string)
         mov rsi, rdi
         xor eax, eax
@@ -318,6 +319,30 @@ macro lillypad_definitions {
         sub rax, rsi
         dec rax
         ret
+    malloc: ; (size)
+        ; Malloc memory is a linked list of blocks, beginning at <MALLOC_INPUT> with a structure like so:
+        FLAGS_FREE = 1
+        struc _malloc_block \{
+            flags dd ?
+            size  dd ?
+            next  dq ? ; pointer to the next block
+        \}
+        virtual at 0
+            _MALLOC_BLOCK _malloc_block
+        end virtual
+
+        cmp qword [_malloc_input], 0x00
+        jnz .not_zero
+            push rdi
+            add rdi, 2
+            syscall SYS_MMAP, ~, ~qword rdi, 3o, (MAP_PRIVATE or MAP_ANONYMOUS), qword -1, ~
+            mov qword [_malloc_input], rax
+            pop rdi
+        .not_zero:
+
+    segment .data
+    _malloc_input dq 0x00
+    segment .text
 }
 
 ; STD FILDES
@@ -326,6 +351,9 @@ enum\
 ; FCNTL O_
 enum\
     O_RDONLY, O_WRONLY, O_RDWR
+; MMAN MAP_
+enum\
+    MAP_SHARED := 0x01, MAP_PRIVATE, MAP_FIXED := 0x10, MAP_ANONYMOUS := 0x20
 ; SYSCALLS as stated in: <https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/>
 enum\
     SYS_READ,                   SYS_WRITE,                  SYS_OPEN,\
