@@ -153,7 +153,6 @@ macro strdef name*, dat*&
 end macro
 
 macro segment flags&
-    display 0x30
     match =.text, flags
         segment readable executable
     else match =.data, flags
