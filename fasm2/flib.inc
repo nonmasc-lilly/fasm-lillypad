@@ -1,313 +1,185 @@
 
-macro ldr_proto kind, expr, rb, rw, rd, rq {
-    local matched
-    matched equ FALSE
-    match =lea, kind \{
-        matched equ TRUE
-        kind rq, expr
-    \}
-    match =FALSE, matched \{
-        match =byte e, expr \\{
-            matched equ TRUE
-            kind rb, byte e
-        \\}
-        match =word e, expr \\{
-            matched equ TRUE
-            kind rw, word e
-        \\}
-        match =dword e, expr \\{
-            matched equ TRUE
-            kind rd, dword e
-        \\}
-        match =qword e, expr \\{
-            matched equ TRUE
-            kind rq, qword e
-        \\}
-        match =FALSE, matched \\{
-            kind rd, dword expr
-        \\}
-    \}
-}
+macro ldr_proto kind, expr, rgb, rgw, rgd, rgq
+    match =lea, kind
+        kind rgq, expr
+    else
+        match =byte e, expr
+            kind rgb, byte e
+        else match =word e, expr
+            kind rgw, word e
+        else match =dword e, expr
+            kind rgd, dworgd e
+        else match =qword e, expr
+            kind rgq, qword e
+        else
+            kind rgd, dword expr
+        end match
+    end match
+end macro
 
-macro ldr_typed expr, rb, rw, rd, rq {
-common
-    local matched
-    matched equ FALSE
-    match =lea e, expr \{
-        matched equ TRUE
-        ldr_proto lea, e, rb, rw, rd, rq
-    \}
-    match =mov e, expr \{
-        matched equ TRUE
-        ldr_proto mov, e, rb, rw, rd, rq
-    \}
-    match =FALSE, matched \{
-        ldr_proto mov, expr, rb, rw, rd, rq
-    \}
-}
+macro ldr_typed expr, rgb, rgw, rgd, rgq
+    match =lea e, expr
+        ldr_proto lea, e, rgb, rgw, rgd, rgq
+    else match =mov e, expr
+        ldr_proto mov, e, rgb, rgw, rgd, rgq
+    else
+        ldr_proto mov, expr, rgb, rgw, rgd, rgq
+    end match
+end macro
 
-macro ldr_nullcheck expr, rb, rw, rd, rq {
-common
-    local matched
-    matched equ FALSE
-    match =~, expr \{
-        matched equ TRUE
-        xor rd, rd
-    \}
-    match =~ e, expr \{
-        matched equ TRUE
-        xor rd, rd
-        ldr_typed e, rb, rw, rd, rq
-    \}
-    match =FALSE, matched \{
-        ldr_typed expr, rb, rw, rd, rq
-    \}
-}
+macro ldr_nullcheck expr, rgb, rgw, rgd, rgq
+    match =~, expr
+        xor rgd, rgd
+    else match =~ e, expr
+        xor rgd, rgd
+        ldr_typed e, rgb, rgw, rgd, rgq
+    else
+        ldr_typed expr, rgb, rgw, rgd, rgq
+    end match
+end macro
 
-macro ldr reg, expr {
-common
-    match =rax, reg \{
+macro ldr reg, expr
+    match =rax, reg
         ldr_nullcheck expr, al, ax, eax, rax
-    \}
-    match =rbx, reg \{
+    else match =rbx, reg
         ldr_nullcheck expr, bl, bx, ebx, rbx
-    \}
-    match =rcx, reg \{
+    else match =rcx, reg
         ldr_nullcheck expr, cl, cx, ecx, rcx
-    \}
-    match =rdx, reg \{
+    else match =rdx, reg
         ldr_nullcheck expr, dl, dx, edx, rdx
-    \}
-    match =rsi, reg \{
+    else match =rsi, reg
         ldr_nullcheck expr, sil, si, esi, rsi
-    \}
-    match =rdi, reg \{
+    else match =rdi, reg
         ldr_nullcheck expr, dil, di, edi, rdi
-    \}
-    match =r8, reg \{
+    else match =r8, reg
         ldr_nullcheck expr, r8b, r8w, r8d, r8
-    \}
-    match =r9, reg \{
+    else match =r9, reg 
         ldr_nullcheck expr, r9b, r9w, r9d, r9
-    \}
-    match =r10, reg \{
+    else match =r10, reg 
         ldr_nullcheck expr, r10b, r10w, r10d, r10
-    \}
-    match =r11, reg \{
+    else match =r11, reg 
         ldr_nullcheck expr, r11b, r11w, r11d, r11
-    \}
-    match =r12, reg \{
+    else match =r12, reg 
         ldr_nullcheck expr, r12b, r12w, r12d, r12
-    \}
-    match =r13, reg \{
+    else match =r13, reg 
         ldr_nullcheck expr, r13b, r13w, r13d, r13
-    \}
-    match =r14, reg \{
+    else match =r14, reg 
         ldr_nullcheck expr, r14b, r14w, r14d, r14
-    \}
-    match =r15, reg \{
+    else match =r15, reg 
         ldr_nullcheck expr, r15b, r15w, r15d, r15
-    \}
-}
+    end match
+end macro
 
-macro syscall syscode*, [arg] {
-common
-    local rg, matched
+macro call_varg a0*, a1*, a2*, a3*, a4*, a5*, arguments*&
+    local rg
     rg = 0
-forward
-match any, arg \{
-    matched equ FALSE
-    match =_ =:== expr, arg \\{
-        matched equ TRUE
-        rg = expr
-    \\}
-    match =FALSE, matched \\{
-        match reg =:== expr, arg \\\{
-            matched equ TRUE
-            ldr reg, expr
-        \\\}
-    \\}
-    match =_, arg \\{
-        matched equ TRUE
-        rg = rg + 1
-    \\}
-    match =FALSE, matched \\{
-        if rg = 0
-            ldr rdi, arg
-        end if
-        if rg = 1
-            ldr rsi, arg
-        end if
-        if rg = 2
-            ldr rdx, arg
-        end if
-        if rg = 3
-            ldr r10, arg
-        end if
-        if rg = 4
-            ldr r8, arg
-        end if
-        if rg = 5
-            ldr r9, arg
-        end if
-        rg = rg + 1
-    \\}
-\}
-common
+    iterate arg, arguments
+        match =_ =:== expr, arg
+            rg = expr
+        else match reg =:== expr, arg
+                ldr reg, expr
+        else match =_, arg
+            rg = rg + 1
+        else
+            if rg = 0
+                ldr a0, arg
+            else if rg = 1
+                ldr a1, arg
+            else if rg = 2
+                ldr a2, arg
+            else if rg = 3
+                ldr a3, arg
+            else if rg = 4
+                ldr a4, arg
+            else if rg = 5
+                ldr a5, arg
+            end if
+            rg = rg + 1
+        end match
+    end iterate
+end macro
+
+macro syscall syscode*, arguments*&
+    call_varg rdi, rsi, rdx, r10, r8, r9, arguments
     ldr rax, ~byte syscode
     syscall
-}
+end macro
 
-macro call name*, [arg] {
-common
-    local rg, matched
-    rg = 0
-forward
-match any, arg \{
-    matched equ FALSE
-    match =_ =:== expr, arg \\{
-        matched equ TRUE
-        rg = expr
-    \\}
-    match =FALSE, matched \\{
-        match reg =:== expr, arg \\\{
-            matched equ TRUE
-            ldr reg, expr
-        \\\}
-    \\}
-    match =_, arg \\{
-        matched equ TRUE
-        rg = rg + 1
-    \\}
-    match =FALSE, matched \\{
-        if rg = 0
-            ldr rdi, arg
-        end if
-        if rg = 1
-            ldr rsi, arg
-        end if
-        if rg = 2
-            ldr rdx, arg
-        end if
-        if rg = 3
-            ldr rcx, arg
-        end if
-        if rg = 4
-            ldr r8, arg
-        end if
-        if rg = 5
-            ldr r9, arg
-        end if
-        rg = rg + 1
-    \\}
-\}
-common
+macro call name*, arguments*&
+    call_varg rdi, rsi, rdx, rcx, r8, r9, arguments
     call name
-}
+end macro
 
-macro strdef_typed name_expr*, [dat] {
-common
-    local matched, kind
-    matched equ FALSE
-    match type name =[ size =], name_expr \{
-        match =byte, type \\{
-            matched equ TRUE
+macro strdef_typed name_expr*, dat*&
+    local kind
+    match type name =[ size =], name_expr
+        match =byte, type
             kind equ db
-        \\}
-        match =word, type \\{
-            matched equ TRUE
+        else match =word, type
             kind equ dw
-        \\}
-        match =dword, type \\{
-            matched equ TRUE
+        else match =dword, type
             kind equ dd
-        \\}
-        match =qword, type \\{
-            matched equ TRUE
+        else match =qword, type
             kind equ dq
-        \\}
-        match =FALSE, matched \\{
+        else
             err
-        \\}
-        matched equ FALSE
+        end match
 
         label name
-        match =byte, size \\{
-            matched equ TRUE
+        match =byte, size
             db @f-$-1
-        \\}
-        match =word, size \\{
-            matched equ TRUE
+        else match =word, size
             dw @f-$-2
-        \\}
-        match =dword, size \\{
-            matched equ TRUE
+        else match =dword, size
             dd @f-$-4
-        \\}
-        match =qword, size \\{
-            matched equ TRUE
+        else match =qword, size
             dq @f-$-8
-        \\}
-        match =FALSE, matched \\{
+        else
             err
-        \\}
-    \}
-    match =FALSE, matched \{
+        end match
+    else
         err
-    \}
-forward
-    kind dat
-common
+    end match
+    match dedication, kind
+        dedication dat
+    else
+        err
+    end match
     @@:
-}
+end macro
 
-segment fix seg
-macro seg first {
-common
-    local matched
-    matched equ FALSE
-    segment fix segment
-    match =.text, first \{
-        matched equ TRUE
-        segment readable executable
-    \}
-    match =.data, first \{
-        matched equ TRUE
-        segment readable writeable
-    \}
-    match =.rodata, first \{
-        matched equ TRUE
-        segment readable
-    \}
-    match =FALSE, matched \{
-        segment first
-    \}
-    segment fix seg
-}
-
-macro strdef name*, [dat] {
-common
+macro strdef name*, dat*&
     strdef_typed byte name [ dword ], dat
-}
+end macro
 
-macro enum [arg] {
-common
+macro segment flags&
+    display 0x30
+    match =.text, flags
+        segment readable executable
+    else match =.data, flags
+        segment readable writeable
+    else match =.rodata, flags
+        segment readable
+    else
+        segment flags
+    end match
+end macro
+
+macro enum arguments*&
     local x, matched
     x = 0
-forward
-    matched equ FALSE
-    match a =:== b, arg \{
-        matched equ TRUE
-        a = b
-        x = b
-    \}
-    match =FALSE, matched \{
-        arg = x
-    \}
-    x = x + 1
-}
+    iterate arg, arguments
+        match a =:== b, arg
+            a = b
+            x = b
+        else
+            arg = x
+        end match
+        x = x + 1
+    end iterate
+end macro
 
-macro lillypad_definitions {
+macro lillypad_definitions
     segment .text
     cstrlen: ; (string)
         mov rsi, rdi
@@ -319,31 +191,8 @@ macro lillypad_definitions {
         sub rax, rsi
         dec rax
         ret
-    malloc: ; (size)
-        ; Malloc memory is a linked list of blocks, beginning at <MALLOC_INPUT> with a structure like so:
-        FLAGS_FREE = 1
-        struc _malloc_block \{
-            flags dd ?
-            size  dd ?
-            next  dq ? ; pointer to the next block
-        \}
-        virtual at 0
-            _MALLOC_BLOCK _malloc_block
-        end virtual
-
-        cmp qword [_malloc_input], 0x00
-        jnz .not_zero
-            push rdi
-            add rdi, 2
-            syscall SYS_MMAP, ~, ~qword rdi, 3o, (MAP_PRIVATE or MAP_ANONYMOUS), qword -1, ~
-            mov qword [_malloc_input], rax
-            pop rdi
-        .not_zero:
-
-    segment .data
-    _malloc_input dq 0x00
     segment .text
-}
+end macro
 
 ; STD FILDES
 enum\

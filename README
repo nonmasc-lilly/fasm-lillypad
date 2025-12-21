@@ -1,4 +1,4 @@
----     fasm-lillypad   (1.2.2)
+---     fasm-lillypad   (1.2.3)
 
 Lillypad is a fasm library implementing basic macros that I commonly use with added syntax nicities.
 
@@ -124,9 +124,12 @@ enum arg*
         - Added lillypad_definitions
         - Added cstrlen under lillypad_definitions
         1.2.1
-        - fix cstrlen
+        - Fix cstrlen
         1.2.2
-        - add O_ fcntl open flags.
+        - Add O_ fcntl open flags.
+        1.2.3
+        - Remove unused definitions
+        - Add support for FASM2
 
 ---     References
 
