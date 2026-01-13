@@ -1,4 +1,4 @@
----     fasm-lillypad   (1.3.8)
+---     fasm-lillypad   (1.3.9)
 
 IMPORTANT       The FASM1 version of the library is depreciated as of 1.3.0
 
@@ -167,6 +167,8 @@ enum arg*
         1.3.7
         - Patch `lodstr'
         1.3.8
+        - Patch `lods'
+        1.3.9
         - Patch `lods'
 
 ---     References

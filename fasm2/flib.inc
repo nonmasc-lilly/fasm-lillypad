@@ -119,14 +119,17 @@ macro lods expr
     match size register, expr
         match =byte, size
             lodsb
+            ldr regster, byte al
         else match =word, size
             lodsw
+            ldr regster, word ax
         else match =dword, size
             lodsd
+            ldr regster, dword eax
         else match =qword, size
             lodsq
+            ldr regster, qword rax
         end match
-        ldr regster, size rax
     else
         lods expr
     end match
