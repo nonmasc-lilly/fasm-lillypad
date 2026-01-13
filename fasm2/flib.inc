@@ -126,7 +126,7 @@ macro lodstr _string
     match any, _string
         ldr lea rsi, _string
     end match
-    lodsd dword rcx
+    lods dword rcx
 end macro
 
 macro strdef_typed name_expr*, dat*&
