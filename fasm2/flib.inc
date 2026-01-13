@@ -116,7 +116,16 @@ macro enter
 end macro
 
 macro lods size*, register
-    lods size [ uses_register ]
+    match size, =byte
+        lodsb
+    else match size, =word
+        lodsw
+    else match size, =dword
+        lodsd
+    else match size, =qword
+        lodsq
+    end match
+
     match any, register
         ldr regster, size rax
     end match
