@@ -110,6 +110,25 @@ macro call name*, arguments*&
     call name
 end macro
 
+macro enter
+    push rbp
+    mov rbp, rsp
+end macro
+
+macro lods size*, register
+    lods size [ uses_register ]
+    match any, register
+        ldr regster, size rax
+    end match
+end macro
+
+macro lodstr _string
+    match any, _string
+        ldr lea rsi, _string
+    end match
+    lodsd dword rcx
+end macro
+
 macro strdef_typed name_expr*, dat*&
     local kind
     match type name =[ size =], name_expr
@@ -179,7 +198,6 @@ macro enum arguments*&
 end macro
 
 macro lillypad_definitions
-    segment .text
     cstrlen: ; (string)
         mov rsi, rdi
         xor eax, eax
@@ -190,7 +208,6 @@ macro lillypad_definitions
         sub rax, rsi
         dec rax
         ret
-    segment .text
 end macro
 
 ; STD FILDES

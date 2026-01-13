@@ -1,4 +1,6 @@
----     fasm-lillypad   (1.2.3)
+---     fasm-lillypad   (1.3.1)
+
+IMPORTANT       The FASM1 version of the library is depreciated as of 1.3.0
 
 Lillypad is a fasm library implementing basic macros that I commonly use with added syntax nicities.
 
@@ -57,6 +59,20 @@ call address*, [arg]
         4: r8
         5: r9
 
+enter
+        Replaces the amd64 instruction `enter' with the following code (this is for speed):
+                push rbp
+                mov rbp, rsp
+
+lods size* register
+        If register is present, moves the result in (size rax) after amd64 lods instruction into specified register
+
+lodstr string
+        Where rsi (or `string' if present) is a string of the format defined by the `strdef' instruction, rsi is set to the beginning of dat and ecx is set
+        to the length of the string. If `string' is present, it is loaded into rsi equivalently to:
+
+                ldr lea rsi, string
+
 strdef_typed name_expr*, [dat]
         Defines a string with a specified size bit-width and element length. name_expr is an expression of the following form:
 
@@ -87,6 +103,8 @@ enum arg*
 
  [1.2.0]        cstrlen(*string)
                         Gives the length of the null terminated string.
+
+        Note that `lillypad_definitions' must be within a `.text' (readable executable) segment.
 
 
 --- Changes to the `segment' command (1.1.0)
@@ -130,6 +148,12 @@ enum arg*
         1.2.3
         - Remove unused definitions
         - Add support for FASM2
+        1.3.0
+        - Change `enter' encoding
+        - Changes made to `lods' instruction
+        - Added the lodstr instruction
+        1.3.1
+        - Update `lillypad_definitions' definition
 
 ---     References
 
