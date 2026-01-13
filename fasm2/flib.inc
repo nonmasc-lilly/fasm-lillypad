@@ -115,19 +115,20 @@ macro enter
     mov rbp, rsp
 end macro
 
-macro lods size*, register
-    match size, =byte
-        lodsb
-    else match size, =word
-        lodsw
-    else match size, =dword
-        lodsd
-    else match size, =qword
-        lodsq
-    end match
-
-    match any, register
+macro lods expr
+    match size register, expr
+        match size, =byte
+            lodsb
+        else match size, =word
+            lodsw
+        else match size, =dword
+            lodsd
+        else match size, =qword
+            lodsq
+        end match
         ldr regster, size rax
+    else
+        lods expr
     end match
 end macro
 
