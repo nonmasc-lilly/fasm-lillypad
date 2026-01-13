@@ -134,7 +134,7 @@ end macro
 
 macro lodstr _string
     match any, _string
-        ldr rsi, lea _string
+        ldr rsi, lea [_string]
     end match
     lods dword rcx
 end macro
