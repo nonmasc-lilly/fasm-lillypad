@@ -8,7 +8,7 @@ macro ldr_proto kind, expr, rgb, rgw, rgd, rgq
         else match =word e, expr
             kind rgw, word e
         else match =dword e, expr
-            kind rgd, dworgd e
+            kind rgd, dword e
         else match =qword e, expr
             kind rgq, qword e
         else
